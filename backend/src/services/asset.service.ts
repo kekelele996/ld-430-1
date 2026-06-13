@@ -78,7 +78,16 @@ export class AssetService {
     };
 
     const historyVersions = asset.versions.map((v) => this.toAssetVersion(v));
-    return [currentVersion, ...historyVersions].sort((a, b) => b.version - a.version);
+    const allVersions = [currentVersion, ...historyVersions];
+
+    const seen = new Set<number>();
+    const unique = allVersions.filter((v) => {
+      if (seen.has(v.version)) return false;
+      seen.add(v.version);
+      return true;
+    });
+
+    return unique.sort((a, b) => b.version - a.version);
   }
 
   private toAssetVersion(v: AssetVersionInfo): AssetVersion {
@@ -134,26 +143,12 @@ export class AssetService {
       throw new BadRequestException('thumbnailUrl 必须是有效的 HTTP URL');
     }
 
-    const now = new Date();
-    const uploaderId = payload.uploaderId ?? 'system';
-
-    const initialVersion: AssetVersionInfo = {
-      version: 1,
-      fileUrl,
-      thumbnailUrl,
-      fileSize: payload.fileSize ?? 0,
-      fileFormat: payload.fileFormat,
-      resolution: payload.resolution,
-      uploadedAt: now,
-      uploaderId,
-    };
-
     const asset = await this.assetModel.create({
       ...payload,
       fileUrl,
       thumbnailUrl,
       version: 1,
-      versions: [initialVersion],
+      versions: [],
     });
     await this.tagService.upsertMany(asset.tags ?? []);
     return this.toAssetWithVersion(asset);

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { DOWNLOAD_ROUTES } from '../routes/download.routes';
@@ -18,7 +18,15 @@ export class DownloadController {
   }
 
   @Post(DOWNLOAD_ROUTES.byAsset)
-  async create(@Param('assetId') assetId: string, @Req() req: Request & { user?: AuthUser }, @Body('purpose') purpose: DownloadPurpose = DownloadPurpose.Personal) {
-    return ok(await this.downloadService.create(assetId, req.user ?? { id: 'anonymous', role: undefined as never }, purpose), '下载已记录');
+  async create(
+    @Param('assetId') assetId: string,
+    @Req() req: Request & { user?: AuthUser },
+    @Body('purpose') purpose: DownloadPurpose = DownloadPurpose.Personal,
+    @Query('version') version?: string,
+  ) {
+    return ok(
+      await this.downloadService.create(assetId, req.user ?? { id: 'anonymous', role: undefined as never }, purpose, version ? Number(version) : undefined),
+      '下载已记录',
+    );
   }
 }

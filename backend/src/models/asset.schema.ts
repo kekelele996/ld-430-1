@@ -4,6 +4,33 @@ import { AssetStatus, AssetType, LicenseType } from '../types/enums';
 
 export type AssetDocument = HydratedDocument<Asset>;
 
+@Schema()
+export class AssetVersionInfo {
+  @Prop({ required: true })
+  version!: number;
+
+  @Prop({ required: true })
+  fileUrl!: string;
+
+  @Prop()
+  thumbnailUrl?: string;
+
+  @Prop({ required: true })
+  fileSize!: number;
+
+  @Prop({ required: true })
+  fileFormat!: string;
+
+  @Prop({ type: { width: Number, height: Number } })
+  resolution?: { width: number; height: number };
+
+  @Prop({ required: true })
+  uploadedAt!: Date;
+
+  @Prop({ required: true })
+  uploaderId!: string;
+}
+
 @Schema({ timestamps: true })
 export class Asset {
   @Prop({ required: true })
@@ -50,6 +77,12 @@ export class Asset {
 
   @Prop({ default: 0 })
   viewCount!: number;
+
+  @Prop({ required: true, default: 1 })
+  version!: number;
+
+  @Prop({ type: [AssetVersionInfo], default: [] })
+  versions!: AssetVersionInfo[];
 }
 
 export const AssetSchema = SchemaFactory.createForClass(Asset);

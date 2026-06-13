@@ -11,3 +11,14 @@ export interface ApiResponse<T> {
   data: T;
   message?: string;
 }
+
+export interface AssetVersion {
+  version: number;
+  fileUrl: string;
+  thumbnailUrl?: string;
+  fileSize: number;
+  fileFormat: string;
+  resolution?: { width: number; height: number };
+  uploadedAt: Date;
+  uploaderId: string;
+}

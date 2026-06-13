@@ -17,19 +17,25 @@ export class DownloadService {
     return this.downloadModel.find().sort({ downloadedAt: -1 }).exec();
   }
 
-  async create(assetId: string, user: AuthUser, purpose: DownloadPurpose) {
+  async create(assetId: string, user: AuthUser, purpose: DownloadPurpose, version?: number) {
     const asset = await this.assetService.findOne(assetId);
     if (!asset) throw new NotFoundException('素材不存在');
     const commercialOnly = [LicenseType.Commercial, LicenseType.Extended].includes(asset.licenseType);
     if (commercialOnly && user.role === UserRole.Viewer && !user.canDownloadCommercial) {
       throw new ForbiddenException('Commercial 许可素材需要额外权限');
     }
+
+    const resolvedVersion = version ?? asset.version;
+    const fileUrl = await this.assetService.getFileUrlByVersion(assetId, resolvedVersion);
+
     await this.assetService.incrementDownload(assetId);
     return this.downloadModel.create({
       assetId: new Types.ObjectId(assetId),
       downloaderId: user.id,
       purpose,
       licenseVersion: `${asset.licenseType}-2026.1`,
+      assetVersion: resolvedVersion,
+      fileUrl,
     });
   }
 }

@@ -21,6 +21,16 @@ export class AssetController {
     return ok(await this.assetService.findOne(id));
   }
 
+  @Get(ASSET_ROUTES.versions)
+  async findVersions(@Param('id') id: string) {
+    return ok(await this.assetService.findVersions(id));
+  }
+
+  @Get(ASSET_ROUTES.versionDetail)
+  async findOneByVersion(@Param('id') id: string, @Param('version') version: string) {
+    return ok(await this.assetService.findOneByVersion(id, Number(version)));
+  }
+
   @Post()
   async create(@Body() payload: Partial<Asset>) {
     return ok(await this.assetService.create(payload), '素材已创建');

@@ -21,10 +21,10 @@ export class DownloadRecord {
   @Prop({ required: true })
   licenseVersion!: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: 1, min: 1 })
   assetVersion!: number;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String, validate: (v: string) => v.startsWith('http') })
   fileUrl!: string;
 }
 

@@ -9,13 +9,13 @@ export class AssetVersionInfo {
   @Prop({ required: true })
   version!: number;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String, validate: (v: string) => v.startsWith('http') })
   fileUrl!: string;
 
-  @Prop()
+  @Prop({ type: String, validate: (v: string) => !v || v.startsWith('http') })
   thumbnailUrl?: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, min: 0 })
   fileSize!: number;
 
   @Prop({ required: true })
@@ -24,12 +24,14 @@ export class AssetVersionInfo {
   @Prop({ type: { width: Number, height: Number } })
   resolution?: { width: number; height: number };
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Date })
   uploadedAt!: Date;
 
   @Prop({ required: true })
   uploaderId!: string;
 }
+
+export const AssetVersionInfoSchema = SchemaFactory.createForClass(AssetVersionInfo);
 
 @Schema({ timestamps: true })
 export class Asset {
@@ -45,13 +47,13 @@ export class Asset {
   @Prop({ required: true })
   fileFormat!: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String, validate: (v: string) => v.startsWith('http') })
   fileUrl!: string;
 
-  @Prop()
+  @Prop({ type: String, validate: (v: string) => !v || v.startsWith('http') })
   thumbnailUrl?: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, min: 0 })
   fileSize!: number;
 
   @Prop({ type: { width: Number, height: Number } })
@@ -72,17 +74,23 @@ export class Asset {
   @Prop({ enum: AssetStatus, default: AssetStatus.Draft })
   status!: AssetStatus;
 
-  @Prop({ default: 0 })
+  @Prop({ default: 0, min: 0 })
   downloadCount!: number;
 
-  @Prop({ default: 0 })
+  @Prop({ default: 0, min: 0 })
   viewCount!: number;
 
-  @Prop({ required: true, default: 1 })
+  @Prop({ required: true, default: 1, min: 1 })
   version!: number;
 
-  @Prop({ type: [AssetVersionInfo], default: [] })
+  @Prop({ type: [AssetVersionInfoSchema], default: [] })
   versions!: AssetVersionInfo[];
+
+  @Prop({ type: Date, required: true })
+  createdAt!: Date;
+
+  @Prop({ type: Date, required: true })
+  updatedAt!: Date;
 }
 
 export const AssetSchema = SchemaFactory.createForClass(Asset);
